@@ -408,10 +408,45 @@
   text-transform: uppercase;
 }
 
+.cache-table__row--focus {
+  background: rgba(207, 101, 55, 0.05);
+}
+
 .cache-table__row--focus td {
-  color: #1c2f42;
   font-weight: 700;
 }
+
+/* Address and state badges in cache table */
+.addr-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: rgba(24, 35, 48, 0.07);
+  color: #3d4f5e;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.state-badge--m { background: rgba(190, 63, 82, 0.13); color: #be3f52; }
+.state-badge--e { background: rgba(60, 139, 98, 0.13); color: #2d7a53; }
+.state-badge--s { background: rgba(47, 115, 151, 0.13); color: #2f7397; }
+.state-badge--o { background: rgba(139, 92, 246, 0.13); color: #6d28d9; }
+.state-badge--i { background: rgba(24, 35, 48, 0.06); color: #8a96a3; }
 
 .bus-node {
   top: 280px;
@@ -578,15 +613,156 @@
   min-width: 40px;
   padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(24, 35, 48, 0.06);
-  color: #4f5b67;
   text-align: center;
-  font-weight: 700;
 }
 
 .protocol-state--highlight {
-  background: rgba(207, 101, 55, 0.14);
-  color: #a04922;
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Bus traffic counters */
+.traffic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.traffic-counter {
+  display: grid;
+  gap: 4px;
+  padding: 20px 22px;
+  border-radius: 22px;
+  border: 1px solid rgba(24, 35, 48, 0.09);
+  background: rgba(255, 251, 244, 0.8);
+  box-shadow: 0 8px 24px rgba(36, 31, 24, 0.07);
+}
+
+.traffic-counter__label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6a7580;
+}
+
+.traffic-counter__value {
+  display: block;
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #1c2f42;
+  line-height: 1;
+  margin: 6px 0 2px;
+}
+
+.traffic-counter__desc {
+  font-size: 0.82rem;
+  color: #8a96a3;
+}
+
+/* Operation log */
+.operation-log {
+  padding: 26px;
+  border-radius: 28px;
+  border: 1px solid rgba(24, 35, 48, 0.1);
+  background: rgba(255, 251, 244, 0.76);
+  box-shadow: 0 28px 80px rgba(36, 31, 24, 0.1);
+}
+
+.operation-log__header {
+  margin-bottom: 18px;
+}
+
+.operation-log__eyebrow {
+  display: inline-flex;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #677482;
+}
+
+.operation-log h2 {
+  font-size: 1.35rem;
+}
+
+.operation-log__entries {
+  display: grid;
+  gap: 10px;
+}
+
+.log-entry {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(24, 35, 48, 0.07);
+  background: rgba(255, 255, 255, 0.6);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.log-entry--current {
+  border-color: rgba(207, 101, 55, 0.32);
+  box-shadow: 0 4px 16px rgba(207, 101, 55, 0.1);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.log-entry__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.log-entry__step {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #8a96a3;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.log-entry__event {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(24, 35, 48, 0.07);
+  color: #203243;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.log-entry__protocol {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: #8a96a3;
+  font-weight: 600;
+}
+
+.log-entry__transitions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.log-entry__transition {
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(24, 35, 48, 0.04);
+  font-size: 0.82rem;
+  color: #3d4f5e;
+}
+
+.log-entry__transition strong {
+  color: #1c2f42;
+}
+
+@media (max-width: 900px) {
+  .traffic-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 1200px) {
@@ -667,7 +843,8 @@
   .simulator-copy,
   .topology-board,
   .mechanics-card,
-  .protocol-card {
+  .protocol-card,
+  .operation-log {
     padding: 22px;
   }
 

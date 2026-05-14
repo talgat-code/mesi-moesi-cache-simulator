@@ -77,33 +77,34 @@ const protocolFamilies = [
   },
 ]
 
+// Three addresses A, B, C — one per cache line — shared across all cores
 const coreSeeds: CacheRow[][] = [
   [
-    { address: '0x1A40', state: 'I', value: '--' },
-    { address: '0x0B10', state: 'S', value: '04' },
-    { address: '0x2200', state: 'E', value: '41' },
+    { address: 'A', state: 'I', value: '--' },
+    { address: 'B', state: 'S', value: '04' },
+    { address: 'C', state: 'E', value: '41' },
   ],
   [
-    { address: '0x1A40', state: 'S', value: '17' },
-    { address: '0x2C18', state: 'I', value: '--' },
-    { address: '0x3308', state: 'M', value: '88' },
+    { address: 'A', state: 'S', value: '17' },
+    { address: 'B', state: 'I', value: '--' },
+    { address: 'C', state: 'M', value: '88' },
   ],
   [
-    { address: '0x2C18', state: 'S', value: '03' },
-    { address: '0x1104', state: 'E', value: '52' },
-    { address: '0x3F20', state: 'I', value: '--' },
+    { address: 'A', state: 'E', value: '52' },
+    { address: 'B', state: 'I', value: '--' },
+    { address: 'C', state: 'S', value: '03' },
   ],
   [
-    { address: '0x3F20', state: 'M', value: '91' },
-    { address: '0x1A40', state: 'I', value: '--' },
-    { address: '0x4100', state: 'S', value: '64' },
+    { address: 'A', state: 'I', value: '--' },
+    { address: 'B', state: 'M', value: '91' },
+    { address: 'C', state: 'S', value: '64' },
   ],
 ]
 
 const memorySeeds = [
-  { address: '0x1A40', value: '17' },
-  { address: '0x2C18', value: '03' },
-  { address: '0x3F20', value: '91' },
+  { address: 'A', value: '17' },
+  { address: 'B', value: '91' },
+  { address: 'C', value: '03' },
 ]
 
 const operations: Operation[] = [
@@ -112,7 +113,7 @@ const operations: Operation[] = [
     coreId: 1,
     label: 'Read miss on shared line',
     event: 'BusRd',
-    address: '0x1A40',
+    address: 'A',
     action: 'CPU 1 reads through the bus, memory replies, and the line settles in Shared because CPU 2 already holds a clean copy.',
     protocol: 'MESI',
     focusStates: ['I', 'S', 'E'],
@@ -124,22 +125,22 @@ const operations: Operation[] = [
       { from: 'bus', to: 'core1', kind: 'data' },
     ],
     transitions: [
-      { actor: 'CPU 1 cache', change: 'I -> S', note: 'Requester loads the line after the miss.' },
-      { actor: 'CPU 2 cache', change: 'S -> S', note: 'Peer keeps a clean shared copy.' },
-      { actor: 'Main memory', change: '17 -> 17', note: 'Memory serves clean data without ownership change.' },
+      { actor: 'CPU 1 cache', change: 'I → S', note: 'Requester loads the line after the miss.' },
+      { actor: 'CPU 2 cache', change: 'S → S', note: 'Peer keeps a clean shared copy.' },
+      { actor: 'Main memory', change: 'A stays 17', note: 'Memory serves clean data without ownership change.' },
     ],
     cacheOverrides: {
-      1: { '0x1A40': { state: 'S', value: '17' } },
-      2: { '0x1A40': { state: 'S', value: '17' } },
+      1: { A: { state: 'S', value: '17' } },
+      2: { A: { state: 'S', value: '17' } },
     },
-    memoryOverrides: { '0x1A40': '17' },
+    memoryOverrides: { A: '17' },
   },
   {
     id: 'write-upgrade',
     coreId: 2,
     label: 'Write upgrade with invalidation',
     event: 'BusUpgr',
-    address: '0x1A40',
+    address: 'A',
     action: 'CPU 2 already has the data, so it upgrades ownership on the bus and invalidates other shared copies before writing.',
     protocol: 'MSI',
     focusStates: ['S', 'M', 'I'],
@@ -149,22 +150,22 @@ const operations: Operation[] = [
       { from: 'bus', to: 'core1', kind: 'invalidate' },
     ],
     transitions: [
-      { actor: 'CPU 2 cache', change: 'S -> M', note: 'Writer becomes the only valid owner.' },
-      { actor: 'CPU 1 cache', change: 'S -> I', note: 'Shared peer is invalidated by the bus upgrade.' },
-      { actor: 'Main memory', change: '17 -> 17', note: 'Data stays dirty in cache until a later flush.' },
+      { actor: 'CPU 2 cache', change: 'S → M', note: 'Writer becomes the only valid owner.' },
+      { actor: 'CPU 1 cache', change: 'S → I', note: 'Shared peer is invalidated by the bus upgrade.' },
+      { actor: 'Main memory', change: 'A stays 17', note: 'Data stays dirty in cache until a later flush.' },
     ],
     cacheOverrides: {
-      1: { '0x1A40': { state: 'I', value: '--' } },
-      2: { '0x1A40': { state: 'M', value: '19' } },
+      1: { A: { state: 'I', value: '--' } },
+      2: { A: { state: 'M', value: '19' } },
     },
-    memoryOverrides: { '0x1A40': '17' },
+    memoryOverrides: { A: '17' },
   },
   {
     id: 'owned-share',
     coreId: 3,
     label: 'Remote read from modified owner',
     event: 'BusRd',
-    address: '0x3F20',
+    address: 'B',
     action: 'CPU 3 reads a line that CPU 4 owns in Modified, so MOESI lets CPU 4 downgrade to Owned and supply the data over the bus.',
     protocol: 'MOESI',
     focusStates: ['M', 'O', 'S', 'I'],
@@ -175,22 +176,22 @@ const operations: Operation[] = [
       { from: 'bus', to: 'core3', kind: 'data' },
     ],
     transitions: [
-      { actor: 'CPU 3 cache', change: 'I -> S', note: 'Requester receives the shared line.' },
-      { actor: 'CPU 4 cache', change: 'M -> O', note: 'Owner keeps responsibility for the freshest data.' },
-      { actor: 'Main memory', change: '91 -> 91', note: 'Writeback is deferred because the owner can still answer reads.' },
+      { actor: 'CPU 3 cache', change: 'I → S', note: 'Requester receives the shared line.' },
+      { actor: 'CPU 4 cache', change: 'M → O', note: 'Owner keeps responsibility for the freshest data.' },
+      { actor: 'Main memory', change: 'B stays 91', note: 'Writeback deferred — the owner can still answer reads.' },
     ],
     cacheOverrides: {
-      3: { '0x3F20': { state: 'S', value: '91' } },
-      4: { '0x3F20': { state: 'O', value: '91' } },
+      3: { B: { state: 'S', value: '91' } },
+      4: { B: { state: 'O', value: '91' } },
     },
-    memoryOverrides: { '0x3F20': '91' },
+    memoryOverrides: { B: '91' },
   },
   {
     id: 'writeback-flush',
     coreId: 4,
     label: 'Flush to main memory',
     event: 'Flush',
-    address: '0x3F20',
+    address: 'B',
     action: 'CPU 4 evicts the dirty line, pushes the latest data over the bus, and memory becomes authoritative again.',
     protocol: 'MOESI',
     focusStates: ['M', 'O', 'I'],
@@ -200,14 +201,14 @@ const operations: Operation[] = [
       { from: 'bus', to: 'memory', kind: 'data' },
     ],
     transitions: [
-      { actor: 'CPU 4 cache', change: 'M -> I', note: 'Dirty line is written back and removed.' },
+      { actor: 'CPU 4 cache', change: 'M → I', note: 'Dirty line is written back and removed.' },
       { actor: 'Shared bus', change: 'Flush active', note: 'Writeback payload travels to memory.' },
-      { actor: 'Main memory', change: '91 -> 91', note: 'Fresh value is committed in DRAM.' },
+      { actor: 'Main memory', change: 'B = 91', note: 'Fresh value is committed in DRAM.' },
     ],
     cacheOverrides: {
-      4: { '0x3F20': { state: 'I', value: '--' } },
+      4: { B: { state: 'I', value: '--' } },
     },
-    memoryOverrides: { '0x3F20': '91' },
+    memoryOverrides: { B: '91' },
   },
 ]
 
@@ -216,7 +217,6 @@ function buildCacheRows(coreIndex: number, activeOperation: Operation): CacheRow
 
   return coreSeeds[coreIndex].map((row) => {
     const override = overrides[row.address]
-
     return override ? { ...row, ...override } : row
   })
 }
@@ -273,15 +273,8 @@ export function HomePage() {
       new Set(
         activeOperation.packets.flatMap((packet) => {
           const ids: number[] = []
-
-          if (packet.from.startsWith('core')) {
-            ids.push(Number(packet.from.replace('core', '')))
-          }
-
-          if (packet.to.startsWith('core')) {
-            ids.push(Number(packet.to.replace('core', '')))
-          }
-
+          if (packet.from.startsWith('core')) ids.push(Number(packet.from.replace('core', '')))
+          if (packet.to.startsWith('core')) ids.push(Number(packet.to.replace('core', '')))
           return ids
         }),
       ),
@@ -301,6 +294,33 @@ export function HomePage() {
         delay: `${index * 0.28}s`,
       })),
     [activeOperation],
+  )
+
+  // Accumulated bus message counts across steps 0..step
+  const busTraffic = useMemo(() => {
+    let reads = 0, upgrades = 0, flushes = 0, invalidations = 0
+    for (let i = 0; i <= step; i++) {
+      const op = operations[i]
+      if (op.event === 'BusRd') reads++
+      if (op.event === 'BusUpgr') upgrades++
+      if (op.event === 'Flush') flushes++
+      invalidations += op.packets.filter((p) => p.kind === 'invalidate').length
+    }
+    return { reads, upgrades, flushes, invalidations }
+  }, [step])
+
+  // Log of all operations completed up to and including the current step
+  const operationLog = useMemo(
+    () =>
+      operations.slice(0, step + 1).map((op, i) => ({
+        step: i + 1,
+        isCurrent: i === step,
+        event: op.event,
+        address: op.address,
+        protocol: op.protocol,
+        transitions: op.transitions,
+      })),
+    [step],
   )
 
   return (
@@ -352,7 +372,7 @@ export function HomePage() {
             <span>
               Step {step + 1} / {operations.length}
             </span>
-            <strong>{activeOperation.address}</strong>
+            <strong>Address {activeOperation.address}</strong>
           </div>
         </div>
 
@@ -431,7 +451,11 @@ export function HomePage() {
             {cores.map((core) => (
               <article
                 key={core.id}
-                className={core.isActive ? `core-node core-node--${core.id} core-node--active` : `core-node core-node--${core.id}`}
+                className={
+                  core.isActive
+                    ? `core-node core-node--${core.id} core-node--active`
+                    : `core-node core-node--${core.id}`
+                }
               >
                 <div className="core-node__header">
                   <div>
@@ -445,9 +469,9 @@ export function HomePage() {
                 <table className="cache-table">
                   <thead>
                     <tr>
-                      <th>Line</th>
+                      <th>Addr</th>
                       <th>State</th>
-                      <th>Value</th>
+                      <th>Val</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -460,8 +484,14 @@ export function HomePage() {
                             : 'cache-table__row'
                         }
                       >
-                        <td>{row.address}</td>
-                        <td>{row.state}</td>
+                        <td>
+                          <span className="addr-badge">{row.address}</span>
+                        </td>
+                        <td>
+                          <span className={`state-badge state-badge--${row.state.toLowerCase()}`}>
+                            {row.state}
+                          </span>
+                        </td>
                         <td>{row.value}</td>
                       </tr>
                     ))}
@@ -499,6 +529,29 @@ export function HomePage() {
           </section>
         </section>
 
+        <section className="traffic-grid" aria-label="Bus traffic counters">
+          <div className="traffic-counter">
+            <span className="traffic-counter__label">BusRd</span>
+            <strong className="traffic-counter__value">{busTraffic.reads}</strong>
+            <span className="traffic-counter__desc">Read requests</span>
+          </div>
+          <div className="traffic-counter">
+            <span className="traffic-counter__label">BusUpgr</span>
+            <strong className="traffic-counter__value">{busTraffic.upgrades}</strong>
+            <span className="traffic-counter__desc">Write upgrades</span>
+          </div>
+          <div className="traffic-counter">
+            <span className="traffic-counter__label">Flush</span>
+            <strong className="traffic-counter__value">{busTraffic.flushes}</strong>
+            <span className="traffic-counter__desc">Writebacks</span>
+          </div>
+          <div className="traffic-counter">
+            <span className="traffic-counter__label">Inval</span>
+            <strong className="traffic-counter__value">{busTraffic.invalidations}</strong>
+            <span className="traffic-counter__desc">Invalidations</span>
+          </div>
+        </section>
+
         <section className="mechanics-grid">
           <article className="mechanics-card">
             <span className="mechanics-card__eyebrow">Flow phases</span>
@@ -517,7 +570,10 @@ export function HomePage() {
             <h2>Who changes state</h2>
             <div className="transition-list">
               {activeOperation.transitions.map((transition) => (
-                <div key={`${transition.actor}-${transition.change}`} className="transition-list__item">
+                <div
+                  key={`${transition.actor}-${transition.change}`}
+                  className="transition-list__item"
+                >
                   <strong>{transition.actor}</strong>
                   <span>{transition.change}</span>
                   <p>{transition.note}</p>
@@ -525,6 +581,36 @@ export function HomePage() {
               ))}
             </div>
           </article>
+        </section>
+
+        <section className="operation-log" aria-label="Operation log">
+          <div className="operation-log__header">
+            <span className="operation-log__eyebrow">Operation log</span>
+            <h2>Steps completed so far</h2>
+          </div>
+          <div className="operation-log__entries">
+            {operationLog.map((entry) => (
+              <div
+                key={entry.step}
+                className={entry.isCurrent ? 'log-entry log-entry--current' : 'log-entry'}
+              >
+                <div className="log-entry__meta">
+                  <span className="log-entry__step">Step {entry.step}</span>
+                  <span className="log-entry__event">{entry.event}</span>
+                  <span className="addr-badge">{entry.address}</span>
+                  <span className="log-entry__protocol">{entry.protocol}</span>
+                </div>
+                <div className="log-entry__transitions">
+                  {entry.transitions.map((t) => (
+                    <span key={`${entry.step}-${t.actor}`} className="log-entry__transition">
+                      <strong>{t.actor.replace(' cache', '').replace('Main ', '')}</strong>
+                      {' '}{t.change}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="protocol-grid" aria-label="Protocol state mechanisms">
@@ -550,8 +636,8 @@ export function HomePage() {
                     key={`${protocol.name}-${state}`}
                     className={
                       activeOperation.focusStates.includes(state)
-                        ? 'protocol-state protocol-state--highlight'
-                        : 'protocol-state'
+                        ? `protocol-state protocol-state--highlight state-badge state-badge--${state.toLowerCase()}`
+                        : `protocol-state state-badge state-badge--${state.toLowerCase()}`
                     }
                   >
                     {state}
