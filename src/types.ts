@@ -1,4 +1,4 @@
-export type MESIState = 'M' | 'E' | 'S' | 'I'
+export type MESIState = 'M' | 'O' | 'E' | 'S' | 'I'
 
 export interface CacheLine {
   index: number
@@ -38,8 +38,21 @@ export interface LogEntry {
   id: string
   text: string
   detail: string
-  kind: 'miss' | 'hit' | 'bus' | 'state' | 'silent' | 'info'
+  kind: 'miss' | 'hit' | 'bus' | 'state' | 'silent' | 'info' | 'step' | 'compare'
+  compareData?: Partial<Record<Protocol, number>>
+  currentProtocol?: Protocol
+  opNum?: number
 }
+
+export interface BusStats {
+  BusRead: number
+  BusReadX: number
+  BusUpgr: number
+  Flush: number
+  Supply: number
+}
+
+export type Protocol = 'MSI' | 'MESI' | 'MOESI'
 
 export interface SimState {
   stepIndex: number
@@ -51,4 +64,8 @@ export interface SimState {
   isAnimating: boolean
   speed: number
   memActive: boolean
+  mode: 'demo' | 'interactive' | 'falsesharing'
+  protocol: Protocol
+  busStats: BusStats
+  allProtoStats: Record<Protocol, BusStats>
 }

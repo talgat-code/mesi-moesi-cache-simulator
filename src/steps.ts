@@ -1,11 +1,11 @@
 import type { MESIState, PktType } from './types'
 
 // ── Layout constants (pixels, within the 900×540 simulator container) ──
-export const CR = 230   // core box right edge
-export const BX = 375   // bus x
-export const ML = 445   // memory left edge
-export const MY = 280   // memory center y
-export const CY = [70, 190, 310, 430] as const  // core center y per id
+export const CR = 256   // core box right edge  (left:12 + width:244)
+export const BX = 424   // bus x
+export const ML = 522   // memory left edge
+export const MY = 270   // memory center y
+export const CY = [66, 200, 334, 468] as const  // core center y per id
 
 // ── Packet colors ──
 export const PKT_COLOR: Record<PktType, string> = {
@@ -71,10 +71,12 @@ const dur = (wps: WP[]) => (wps.length - 1) * SEG
 // ── Addresses ──
 export const ADDR_A = 0xa0
 export const ADDR_B = 0xb0
+export const ADDR_C = 0xc0
 
 export const INITIAL_MEM: [number, number][] = [
   [ADDR_A, 0x42],
   [ADDR_B, 0x73],
+  [ADDR_C, 0x55],
 ]
 
 // ── The 9 simulation steps ──
