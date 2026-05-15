@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'MESI Cache Coherence Simulator',
   description: 'Interactive 2D animation of the MESI cache coherence protocol',
+  icons: {
+    icon: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

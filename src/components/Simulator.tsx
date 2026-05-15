@@ -525,6 +525,60 @@ const STAT_COLOR: Record<string, string> = {
 const hex  = (n: number) => `0x${n.toString(16).toUpperCase()}`
 const hex2 = (n: number) => `0x${n.toString(16).toUpperCase().padStart(2, '0')}`
 
+// ─── Logo ─────────────────────────────────────────────────────────────────────
+function Logo() {
+  return (
+    <svg viewBox="0 0 52 52" width="52" height="52" className={styles.logo}>
+      <defs>
+        <filter id="logo-glow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="1.5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <linearGradient id="logo-ring" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"   stopColor="#3b82f6"/>
+          <stop offset="50%"  stopColor="#a855f7"/>
+          <stop offset="100%" stopColor="#06b6d4"/>
+        </linearGradient>
+      </defs>
+      <circle cx="26" cy="26" r="24.5" fill="none"
+        stroke="url(#logo-ring)" strokeWidth="1" opacity="0.42"/>
+      <rect x="12" y="12" width="28" height="28" rx="4"
+        fill="#040c1e" stroke="#172848" strokeWidth="1.5"/>
+      <rect x="18" y="9"  width="2" height="3" rx="0.5" fill="#1a3060" opacity="0.9"/>
+      <rect x="32" y="9"  width="2" height="3" rx="0.5" fill="#1a3060" opacity="0.9"/>
+      <rect x="18" y="40" width="2" height="3" rx="0.5" fill="#1a3060" opacity="0.9"/>
+      <rect x="32" y="40" width="2" height="3" rx="0.5" fill="#1a3060" opacity="0.9"/>
+      <rect x="9"  y="18" width="3" height="2" rx="0.5" fill="#1a3060" opacity="0.9"/>
+      <rect x="9"  y="32" width="3" height="2" rx="0.5" fill="#1a3060" opacity="0.9"/>
+      <rect x="40" y="18" width="3" height="2" rx="0.5" fill="#1a3060" opacity="0.9"/>
+      <rect x="40" y="32" width="3" height="2" rx="0.5" fill="#1a3060" opacity="0.9"/>
+      <line x1="23" y1="23" x2="26" y2="26" stroke="#3b82f6" strokeWidth="1.3" opacity="0.70"/>
+      <line x1="29" y1="23" x2="26" y2="26" stroke="#a855f7" strokeWidth="1.3" opacity="0.70"/>
+      <line x1="23" y1="29" x2="26" y2="26" stroke="#06b6d4" strokeWidth="1.3" opacity="0.70"/>
+      <line x1="29" y1="29" x2="26" y2="26" stroke="#f59e0b" strokeWidth="1.3" opacity="0.70"/>
+      <rect x="14" y="14" width="9" height="9" rx="2"
+        fill="#0d1e48" stroke="#3b82f6" strokeWidth="1.2" filter="url(#logo-glow)"/>
+      <text x="18.5" y="21" textAnchor="middle" fill="#60a5fa"
+        fontSize="4.8" fontWeight="800" fontFamily="monospace">C0</text>
+      <rect x="29" y="14" width="9" height="9" rx="2"
+        fill="#1a0d48" stroke="#a855f7" strokeWidth="1.2" filter="url(#logo-glow)"/>
+      <text x="33.5" y="21" textAnchor="middle" fill="#c084fc"
+        fontSize="4.8" fontWeight="800" fontFamily="monospace">C1</text>
+      <rect x="14" y="29" width="9" height="9" rx="2"
+        fill="#042030" stroke="#06b6d4" strokeWidth="1.2" filter="url(#logo-glow)"/>
+      <text x="18.5" y="36" textAnchor="middle" fill="#22d3ee"
+        fontSize="4.8" fontWeight="800" fontFamily="monospace">C2</text>
+      <rect x="29" y="29" width="9" height="9" rx="2"
+        fill="#201608" stroke="#f59e0b" strokeWidth="1.2" filter="url(#logo-glow)"/>
+      <text x="33.5" y="36" textAnchor="middle" fill="#fbbf24"
+        fontSize="4.8" fontWeight="800" fontFamily="monospace">C3</text>
+      <circle cx="26" cy="26" r="3.5" fill="#040c1e"
+        stroke="#2563eb" strokeWidth="1.2" filter="url(#logo-glow)"/>
+      <circle cx="26" cy="26" r="2" fill="#3b82f6" opacity="0.9"/>
+    </svg>
+  )
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 function StateBadge({ s }: { s: string }) {
   return (
@@ -1131,9 +1185,17 @@ export function Simulator() {
   return (
     <div className={styles.app}>
       <header className={styles.header}>
-        <h1 className={styles.title}>
-          {displayProtocol} Cache Coherence Simulator
-        </h1>
+        <div className={styles.headerBrand}>
+          <Logo />
+          <div className={styles.headerTitles}>
+            <h1 className={styles.title}>
+              {displayProtocol} Cache Coherence Simulator
+            </h1>
+            <p className={styles.headerSubtitle}>
+              Interactive visualization of cache coherence protocols
+            </p>
+          </div>
+        </div>
         <Legend protocol={displayProtocol} />
       </header>
 
