@@ -1,9 +1,9 @@
 import type { MESIState, PktType } from './types'
 
-// ── Layout constants (pixels, within the 900×540 simulator container) ──
+// ── Layout constants (pixels, within the 1050×540 simulator container) ──
 export const CR = 256   // core box right edge  (left:12 + width:244)
-export const BX = 424   // bus x
-export const ML = 522   // memory left edge
+export const BX = 510   // bus x
+export const ML = 640   // memory left edge
 export const MY = 270   // memory center y
 export const CY = [66, 200, 334, 468] as const  // core center y per id
 
@@ -77,6 +77,19 @@ export const INITIAL_MEM: [number, number][] = [
   [ADDR_A, 0x42],
   [ADDR_B, 0x73],
   [ADDR_C, 0x55],
+]
+
+// Same 9-operation sequence used for all protocol scenario demos (MSI / MESI / MOESI)
+export const DEMO_OPS: Array<{ type: 'read' | 'write'; coreId: number; address: number; data: number }> = [
+  { type: 'read',  coreId: 0, address: ADDR_A, data: 0    },
+  { type: 'read',  coreId: 1, address: ADDR_A, data: 0    },
+  { type: 'read',  coreId: 2, address: ADDR_A, data: 0    },
+  { type: 'write', coreId: 0, address: ADDR_A, data: 0xFF },
+  { type: 'read',  coreId: 3, address: ADDR_B, data: 0    },
+  { type: 'write', coreId: 3, address: ADDR_B, data: 0x99 },
+  { type: 'read',  coreId: 1, address: ADDR_A, data: 0    },
+  { type: 'write', coreId: 2, address: ADDR_A, data: 0xAA },
+  { type: 'read',  coreId: 0, address: ADDR_B, data: 0    },
 ]
 
 // ── The 9 simulation steps ──

@@ -50,13 +50,16 @@
 
 .simCanvas {
   position: relative;
-  width: 900px;
+  width: 1050px;
   height: 540px;
-  /* circuit-board dot grid */
+  /* circuit-board dot grid with subtle corner glows */
   background-color: #04080f;
   background-image:
-    radial-gradient(circle, #0e2040 1.5px, transparent 1.5px);
-  background-size: 28px 28px;
+    radial-gradient(ellipse at 3% 6%,  rgba(59,130,246,0.08) 0%, transparent 38%),
+    radial-gradient(ellipse at 3% 94%, rgba(168,85,247,0.08) 0%, transparent 38%),
+    radial-gradient(ellipse at 68% 50%, rgba(6,182,212,0.05) 0%, transparent 32%),
+    radial-gradient(circle, #091828 1px, transparent 1px);
+  background-size: auto, auto, auto, 22px 22px;
   border: 1px solid #122040;
   border-radius: 16px;
   overflow: hidden;
@@ -159,7 +162,7 @@
 
 .cacheTable th {
   text-align: left;
-  color: #1e3a6e;
+  color: #2e5080;
   font-weight: 700;
   font-size: 8.5px;
   padding: 2px 4px;
@@ -172,17 +175,47 @@
 .cacheTable td {
   padding: 2.5px 4px;
   font-size: 10.5px;
-  color: #3a5a8a;
+  color: #6a8fb8;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
+/* Miss (cache load from I) → amber/yellow */
 .flash td {
-  animation: rowFlash 0.75s ease;
+  animation: rowFlash 0.8s ease;
+}
+@keyframes rowFlash {
+  0%   { background: rgba(251,191,36,0.30); color: #fbbf24; }
+  60%  { background: rgba(251,191,36,0.08); }
+  100% { background: transparent; }
 }
 
-@keyframes rowFlash {
-  0%   { background: rgba(251,191,36,0.28); color: #fbbf24; }
-  65%  { background: rgba(251,191,36,0.06); }
+/* Invalidation (state → I) → red */
+.flashInvalidate td {
+  animation: rowFlashInvalidate 0.8s ease;
+}
+@keyframes rowFlashInvalidate {
+  0%   { background: rgba(239,68,68,0.38); color: #f87171; }
+  60%  { background: rgba(239,68,68,0.08); }
+  100% { background: transparent; }
+}
+
+/* Cache hit (same state) → green */
+.flashHit td {
+  animation: rowFlashHit 0.7s ease;
+}
+@keyframes rowFlashHit {
+  0%   { background: rgba(34,197,94,0.32); color: #4ade80; }
+  60%  { background: rgba(34,197,94,0.06); }
+  100% { background: transparent; }
+}
+
+/* State upgrade / transition (non-I → different non-I) → blue */
+.flashUpdate td {
+  animation: rowFlashUpdate 0.8s ease;
+}
+@keyframes rowFlashUpdate {
+  0%   { background: rgba(59,130,246,0.32); color: #93c5fd; }
+  60%  { background: rgba(59,130,246,0.07); }
   100% { background: transparent; }
 }
 
@@ -208,9 +241,10 @@
 .memBox {
   background: linear-gradient(150deg, #06101f 0%, #080f1e 100%);
   border: 1px solid #0f2040;
+  border-left: 2px solid #ca8a04;
   border-radius: 10px;
   padding: 10px 12px;
-  width: 165px;
+  width: 178px;
   transition: border-color 0.22s, box-shadow 0.22s;
 }
 
@@ -235,13 +269,13 @@
 .memHeader {
   font-size: 8.5px;
   font-weight: 800;
-  color: #1e4060;
+  color: #a16207;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-family: 'JetBrains Mono', monospace;
   margin-bottom: 7px;
   padding-bottom: 6px;
-  border-bottom: 1px solid #0e2040;
+  border-bottom: 1px solid #1e3010;
 }
 
 /* ─── Bus overlay ────────────────────────────────────────────────────────── */
@@ -532,23 +566,6 @@
   transition: width 0.4s ease;
 }
 
-/* ─── Mode tabs ──────────────────────────────────────────────────────────── */
-.modeTabs { display: flex; gap: 3px; }
-.modeTab {
-  padding: 4px 13px;
-  border-radius: 6px;
-  border: 1px solid #0e1e38;
-  background: #060e1e;
-  color: #1e3562;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: all 0.15s;
-  font-family: inherit;
-}
-.modeTab:hover { color: #3a5a8a; border-color: #152844; }
-.modeTabActive { background: #0a1f4e; border-color: #1e4898; color: #7eb3ff; }
 
 /* ─── Protocol selector ──────────────────────────────────────────────────── */
 .protoSelector {
@@ -560,7 +577,7 @@
   border: 1px solid #0e1e38;
   border-radius: 12px;
   padding: 10px 14px;
-  width: 900px;
+  width: 1050px;
 }
 
 .protoTabs { display: flex; gap: 3px; }
@@ -589,7 +606,7 @@
   border: 1px solid #0e1e38;
   border-radius: 12px;
   padding: 12px 14px;
-  width: 900px;
+  width: 1050px;
 }
 
 .opPanelTitle {
@@ -697,7 +714,287 @@
 }
 .busStatDivider { width: 1px; height: 12px; background: #0e1e38; }
 
+/* ─── Mode tab: 3 tabs ───────────────────────────────────────────────────── */
+.modeTabs { display: flex; gap: 3px; }
+.modeTab {
+  padding: 4px 13px;
+  border-radius: 6px;
+  border: 1px solid #0e1e38;
+  background: #060e1e;
+  color: #1e3562;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.modeTab:hover { color: #3a5a8a; border-color: #152844; }
+.modeTabActive { background: #0a1f4e; border-color: #1e4898; color: #7eb3ff; }
+
+/* ─── Scenario quick-launch buttons ─────────────────────────────────────── */
+.scenarioBtns {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.btnScenario {
+  padding: 4px 11px;
+  font-size: 10.5px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  border-color: #152850;
+  background: #07102a;
+  color: #3a5a8a;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+}
+.btnScenario:hover:not(:disabled) {
+  background: #0a1a3e;
+  border-color: #1e4898;
+  color: #7eb3ff;
+  box-shadow: 0 0 10px rgba(59,130,246,0.18);
+}
+.btnScenarioActive {
+  background: #0a1f4e !important;
+  border-color: #2563eb !important;
+  color: #7eb3ff !important;
+  box-shadow: 0 0 12px rgba(59,130,246,0.25);
+}
+
+/* ─── False Sharing controls ─────────────────────────────────────────────── */
+.btnFsOn {
+  background: rgba(127,29,29,0.25);
+  border-color: #7f1d1d;
+  color: #fca5a5;
+  font-size: 11px;
+}
+.btnFsOn:hover:not(:disabled) {
+  background: rgba(153,27,27,0.4);
+  border-color: #ef4444;
+  box-shadow: 0 0 12px rgba(239,68,68,0.2);
+}
+
+.btnFsOff {
+  background: rgba(20,83,45,0.25);
+  border-color: #14532d;
+  color: #86efac;
+  font-size: 11px;
+}
+.btnFsOff:hover:not(:disabled) {
+  background: rgba(22,101,52,0.4);
+  border-color: #22c55e;
+  box-shadow: 0 0 12px rgba(34,197,94,0.2);
+}
+
+.fsBtns { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 12px; }
+
+.fsComparison {
+  margin-top: 14px;
+  border: 1px solid #0e1e38;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.fsCompHeader {
+  font-size: 8.5px;
+  font-weight: 800;
+  color: #1e3562;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 6px 12px;
+  background: #060e1e;
+  border-bottom: 1px solid #0e1e38;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.fsCompRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 12px;
+  font-size: 11px;
+  color: #3a5a8a;
+  border-bottom: 1px solid #0a1828;
+  font-family: 'JetBrains Mono', monospace;
+  flex-wrap: wrap;
+}
+.fsCompRow:last-child { border-bottom: none; }
+
+.fsLabel {
+  font-size: 9px;
+  font-weight: 800;
+  min-width: 24px;
+  letter-spacing: 0.06em;
+}
+
+.fsSummary {
+  padding: 8px 12px;
+  font-size: 10.5px;
+  color: #3a5a8a;
+  background: rgba(30,58,138,0.08);
+  border-top: 1px solid #0e1e38;
+  font-style: italic;
+}
+
 /* ─── Legend ─────────────────────────────────────────────────────────────── */
-.legend     { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-.legendItem { display: flex; align-items: center; gap: 5px; }
-.legendName { font-size: 10.5px; color: #1e3562; font-weight: 500; }
+.legend        { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.legendItem    { display: flex; align-items: center; gap: 5px; }
+.legendName    { font-size: 10.5px; color: #1e3562; font-weight: 500; }
+.legendDivider { width: 1px; height: 14px; background: #0e1e38; margin: 0 2px; }
+.flashDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+  opacity: 0.85;
+}
+
+/* ─── Core accent bar ────────────────────────────────────────────────────────── */
+.coreAccentBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 3px;
+  border-radius: 10px 0 0 0;
+  pointer-events: none;
+}
+
+/* ─── What Happened? card ────────────────────────────────────────────────────── */
+.whatHappened {
+  background: linear-gradient(150deg, #0a1a10 0%, #0c1c14 100%);
+  border: 1px solid #14382a;
+  border-radius: 12px;
+  padding: 12px 14px;
+  overflow: hidden;
+}
+
+.whatHappenedHeader {
+  font-size: 9px;
+  font-weight: 800;
+  color: #1a5a38;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #14382a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.whatHappenedOp {
+  font-size: 12px;
+  font-weight: 700;
+  color: #c8e8d8;
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+
+.whatHappenedSub {
+  font-size: 10px;
+  font-weight: 600;
+  color: #2e8a58;
+  margin-bottom: 8px;
+  letter-spacing: 0.01em;
+}
+
+.whatHappenedDesc {
+  font-size: 10.5px;
+  color: #3a6a50;
+  line-height: 1.7;
+  border-top: 1px solid #0e2a1e;
+  padding-top: 7px;
+  margin-top: 4px;
+}
+
+/* ─── Protocol key features card ─────────────────────────────────────────────── */
+.protoKeyCard {
+  background: linear-gradient(150deg, #080f1e 0%, #090e1c 100%);
+  border: 1px solid #1e3a6e;
+  border-radius: 12px;
+  padding: 12px 14px;
+  overflow: hidden;
+}
+
+.protoKeyHeader {
+  font-size: 10.5px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #0e1e38;
+  letter-spacing: 0.02em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.protoKeyList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.protoKeyItem {
+  font-size: 10.5px;
+  color: #3a5a8a;
+  line-height: 1.55;
+  padding-left: 12px;
+  position: relative;
+}
+
+.protoKeyItem::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: #1e4070;
+  font-weight: 700;
+}
+
+/* ─── Cache stats bar ────────────────────────────────────────────────────────── */
+.cacheStatsBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #04080e;
+  border: 1px solid #0b1830;
+  border-radius: 10px;
+  padding: 7px 14px;
+  width: 1050px;
+}
+
+.cacheStatItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cacheStatDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cacheStatLabel {
+  font-size: 8.5px;
+  color: #1a2f50;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.cacheStatCount {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 800;
+  min-width: 20px;
+  text-align: right;
+}

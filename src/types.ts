@@ -6,6 +6,7 @@ export interface CacheLine {
   data: number
   state: MESIState
   flash: boolean
+  flashKind: 'miss' | 'hit' | 'invalidate' | 'update' | null
 }
 
 export interface CoreState {
@@ -42,6 +43,7 @@ export interface LogEntry {
   compareData?: Partial<Record<Protocol, number>>
   currentProtocol?: Protocol
   opNum?: number
+  stepDescription?: string
 }
 
 export interface BusStats {
@@ -50,6 +52,13 @@ export interface BusStats {
   BusUpgr: number
   Flush: number
   Supply: number
+}
+
+export interface CacheStats {
+  hits: number
+  misses: number
+  invalidations: number
+  writebacks: number
 }
 
 export type Protocol = 'MSI' | 'MESI' | 'MOESI'
@@ -64,8 +73,11 @@ export interface SimState {
   isAnimating: boolean
   speed: number
   memActive: boolean
-  mode: 'demo' | 'interactive' | 'falsesharing'
+  mode: 'demo' | 'scenario' | 'interactive' | 'falsesharing'
   protocol: Protocol
   busStats: BusStats
   allProtoStats: Record<Protocol, BusStats>
+  scenarioStep: number
+  fsStats: { on: BusStats | null; off: BusStats | null }
+  cacheStats: CacheStats
 }
