@@ -1,0 +1,817 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.simulator-page {
+  padding: 40px 24px 56px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 192, 118, 0.26), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(64, 120, 166, 0.2), transparent 30%),
+    linear-gradient(180deg, #f6f0e2 0%, #eadfcb 100%);
+}
+
+.simulator-shell {
+  width: min(1360px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 22px;
+}
+
+.simulator-copy,
+.simulator-status,
+.simulator-controls,
+.topology-board,
+.mechanics-card,
+.protocol-card {
+  border: 1px solid rgba(24, 35, 48, 0.1);
+  border-radius: 28px;
+  box-shadow: 0 28px 80px rgba(36, 31, 24, 0.1);
+}
+
+.simulator-copy {
+  padding: 32px;
+  background: rgba(255, 251, 244, 0.76);
+}
+
+.simulator-copy__eyebrow,
+.simulator-status__label,
+.topology-event__eyebrow,
+.core-node__eyebrow,
+.bus-node__eyebrow,
+.memory-node__eyebrow,
+.mechanics-card__eyebrow,
+.protocol-card__name {
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+
+.simulator-copy__eyebrow {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(24, 35, 48, 0.06);
+  color: #53606d;
+}
+
+.simulator-copy h1 {
+  margin: 16px 0 12px;
+  max-width: 10ch;
+  font-size: clamp(3rem, 6vw, 5.6rem);
+  line-height: 0.95;
+}
+
+.simulator-copy p {
+  max-width: 70ch;
+  font-size: 1.05rem;
+}
+
+.simulator-status {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 20px 24px;
+  background: rgba(29, 41, 54, 0.94);
+  color: #f5ebd7;
+}
+
+.simulator-status strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.15rem;
+}
+
+.simulator-status__label {
+  color: rgba(245, 235, 215, 0.68);
+}
+
+.simulator-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 24px;
+  background: rgba(255, 250, 242, 0.78);
+}
+
+.simulator-controls__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.simulator-button {
+  min-width: 88px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(24, 35, 48, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: #203243;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.simulator-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(36, 31, 24, 0.08);
+}
+
+.simulator-button--primary {
+  border-color: rgba(207, 101, 55, 0.32);
+  background: #cf6537;
+  color: #fff8ef;
+}
+
+.simulator-controls__meta {
+  display: grid;
+  justify-items: end;
+  color: #5b6772;
+  font-size: 0.92rem;
+}
+
+.simulator-controls__meta strong {
+  color: #1c2f42;
+  font-size: 1rem;
+}
+
+.topology-board {
+  position: relative;
+  min-height: 860px;
+  padding: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.94) 0%, rgba(248, 242, 232, 0.88) 100%);
+  overflow: hidden;
+}
+
+.topology-board::before {
+  content: '';
+  position: absolute;
+  inset: 28px;
+  border-radius: 24px;
+  border: 1px dashed rgba(61, 85, 109, 0.12);
+}
+
+.topology-board__legend {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: start;
+}
+
+.topology-board__labels {
+  position: absolute;
+  inset: 132px 28px auto 28px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.topology-board__label {
+  position: absolute;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 251, 245, 0.92);
+  border: 1px solid rgba(24, 35, 48, 0.08);
+  color: #586575;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.topology-board__label--processors {
+  left: 22px;
+  top: 64px;
+}
+
+.topology-board__label--bus {
+  left: 540px;
+  top: 272px;
+}
+
+.topology-board__label--memory {
+  right: 12px;
+  top: 214px;
+}
+
+.topology-board__wires {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(55, 81, 106, 0.24);
+  pointer-events: none;
+}
+
+.topology-wire {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.5;
+}
+
+.topology-wire--backbone {
+  color: rgba(55, 81, 106, 0.18);
+  stroke-width: 20;
+  opacity: 1;
+}
+
+.topology-wire--bus-spine {
+  color: rgba(55, 81, 106, 0.22);
+  stroke-width: 14;
+  opacity: 0.9;
+}
+
+.topology-wire--active {
+  color: #cf6537;
+  opacity: 1;
+  filter: drop-shadow(0 0 12px rgba(207, 101, 55, 0.38));
+}
+
+.topology-wire--memory {
+  color: #2f7397;
+}
+
+.wire-particle {
+  stroke: rgba(255, 255, 255, 0.95);
+  stroke-width: 2;
+}
+
+.wire-particle--request {
+  fill: #cf6537;
+  filter: drop-shadow(0 0 8px rgba(207, 101, 55, 0.55));
+}
+
+.wire-particle--data {
+  fill: #2f7397;
+  filter: drop-shadow(0 0 8px rgba(47, 115, 151, 0.55));
+}
+
+.wire-particle--invalidate {
+  fill: #be3f52;
+  filter: drop-shadow(0 0 8px rgba(190, 63, 82, 0.55));
+}
+
+.wire-particle--flush {
+  fill: #3c8b62;
+  filter: drop-shadow(0 0 8px rgba(60, 139, 98, 0.55));
+}
+
+.topology-event,
+.topology-cores,
+.bus-node,
+.memory-node {
+  position: relative;
+  z-index: 1;
+}
+
+.topology-event {
+  width: min(560px, 100%);
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: rgba(28, 43, 58, 0.92);
+  color: #f7efdf;
+}
+
+.topology-event strong {
+  display: block;
+  margin: 8px 0;
+  font-size: 1.3rem;
+}
+
+.topology-event p {
+  color: rgba(247, 239, 223, 0.78);
+}
+
+.topology-flow-key {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.topology-flow-key__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: #344556;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.topology-flow-key__item::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.topology-flow-key__item--request::before {
+  background: #cf6537;
+}
+
+.topology-flow-key__item--data::before {
+  background: #2f7397;
+}
+
+.topology-flow-key__item--invalidate::before {
+  background: #be3f52;
+}
+
+.topology-flow-key__item--flush::before {
+  background: #3c8b62;
+}
+
+.core-node,
+.bus-node,
+.memory-node {
+  position: absolute;
+}
+
+.topology-cores {
+  position: absolute;
+  inset: 0;
+}
+
+.core-node {
+  width: 260px;
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(24, 35, 48, 0.08);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow:
+    0 16px 34px rgba(32, 28, 22, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.core-node--active {
+  transform: translateY(-4px);
+  border-color: rgba(207, 101, 55, 0.38);
+  box-shadow:
+    0 24px 44px rgba(207, 101, 55, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.core-node--1 {
+  top: 150px;
+  left: 60px;
+}
+
+.core-node--2 {
+  top: 150px;
+  left: 360px;
+}
+
+.core-node--3 {
+  top: 520px;
+  left: 60px;
+}
+
+.core-node--4 {
+  top: 520px;
+  left: 360px;
+}
+
+.core-node__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.core-node__eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  color: #677481;
+}
+
+.core-node h2,
+.bus-node h2,
+.memory-node h2,
+.mechanics-card h2 {
+  font-size: 1.35rem;
+}
+
+.core-node__badge {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(24, 35, 48, 0.06);
+  color: #55616e;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.core-node--active .core-node__badge {
+  background: rgba(207, 101, 55, 0.14);
+  color: #a04922;
+}
+
+.core-node__body {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.core-node__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(31, 45, 59, 0.08) 0%, rgba(31, 45, 59, 0.03) 100%);
+  border: 1px solid rgba(24, 35, 48, 0.08);
+  color: #445260;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.core-node__cache-label {
+  margin-bottom: 2px;
+  color: #6e7a86;
+  font-size: 0.82rem;
+}
+
+.node-port {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 3px solid rgba(255, 255, 255, 0.94);
+  background: #cf6537;
+  box-shadow: 0 0 0 4px rgba(207, 101, 55, 0.16);
+}
+
+.core-node .node-port {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.core-node--1 .node-port,
+.core-node--2 .node-port {
+  bottom: -9px;
+}
+
+.core-node--3 .node-port,
+.core-node--4 .node-port {
+  top: -9px;
+}
+
+.cache-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cache-table th,
+.cache-table td {
+  padding: 10px 0;
+  text-align: left;
+  border-bottom: 1px solid rgba(24, 35, 48, 0.08);
+  font-size: 0.9rem;
+}
+
+.cache-table th {
+  color: #6a7480;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cache-table__row--focus td {
+  color: #1c2f42;
+  font-weight: 700;
+}
+
+.bus-node {
+  top: 350px;
+  left: 610px;
+  width: 160px;
+  min-height: 160px;
+  padding: 22px 18px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #25384a 0%, #18242f 100%);
+  color: #f8efdf;
+  text-align: center;
+  box-shadow:
+    0 26px 44px rgba(19, 31, 42, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.bus-node__eyebrow,
+.memory-node__eyebrow,
+.mechanics-card__eyebrow {
+  color: rgba(248, 239, 223, 0.66);
+}
+
+.bus-node__event {
+  margin: 16px auto 14px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  font-weight: 700;
+  width: fit-content;
+}
+
+.bus-node p {
+  color: rgba(248, 239, 223, 0.74);
+  font-size: 0.9rem;
+}
+
+.bus-node .node-port--left {
+  left: -9px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.bus-node .node-port--right {
+  right: -9px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #2f7397;
+  box-shadow: 0 0 0 4px rgba(47, 115, 151, 0.16);
+}
+
+.memory-node {
+  top: 300px;
+  right: 64px;
+  width: 220px;
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(44, 84, 110, 0.96);
+  color: #f6ecda;
+  box-shadow:
+    0 26px 46px rgba(23, 47, 64, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.memory-node .node-port--left {
+  left: -9px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #2f7397;
+  box-shadow: 0 0 0 4px rgba(47, 115, 151, 0.16);
+}
+
+.memory-table {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.memory-table__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.memory-table__row span {
+  color: rgba(246, 236, 218, 0.72);
+}
+
+.memory-table__row strong {
+  color: #fffdf8;
+}
+
+.memory-table__row--focus {
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.mechanics-grid,
+.protocol-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.mechanics-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mechanics-card,
+.protocol-card {
+  padding: 24px;
+  background: rgba(255, 252, 246, 0.78);
+}
+
+.mechanics-card__eyebrow {
+  color: #667482;
+}
+
+.mechanics-card h2 {
+  margin: 10px 0 18px;
+}
+
+.phase-list,
+.transition-list {
+  display: grid;
+  gap: 12px;
+}
+
+.phase-list__item,
+.transition-list__item {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(24, 35, 48, 0.08);
+}
+
+.transition-list__item strong,
+.transition-list__item span {
+  display: block;
+}
+
+.transition-list__item span {
+  margin: 4px 0 8px;
+  color: #cf6537;
+  font-weight: 700;
+}
+
+.protocol-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.protocol-card {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.protocol-card--active {
+  transform: translateY(-3px);
+  border-color: rgba(207, 101, 55, 0.34);
+  box-shadow: 0 22px 44px rgba(207, 101, 55, 0.12);
+}
+
+.protocol-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.protocol-card__tag {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(24, 35, 48, 0.06);
+  color: #55616e;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.protocol-card p {
+  margin: 14px 0 18px;
+}
+
+.protocol-card__states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.protocol-state {
+  min-width: 40px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(24, 35, 48, 0.06);
+  color: #4f5b67;
+  text-align: center;
+  font-weight: 700;
+}
+
+.protocol-state--highlight {
+  background: rgba(207, 101, 55, 0.14);
+  color: #a04922;
+}
+
+@media (max-width: 1200px) {
+  .topology-board {
+    min-height: auto;
+    display: grid;
+    gap: 18px;
+    padding-top: 28px;
+  }
+
+  .topology-board::before,
+  .topology-board__labels,
+  .topology-board__wires,
+  .wire-particle {
+    display: none;
+  }
+
+  .topology-board__legend {
+    grid-template-columns: 1fr;
+  }
+
+  .topology-flow-key {
+    justify-content: flex-start;
+  }
+
+  .topology-event,
+  .topology-cores,
+  .bus-node,
+  .memory-node,
+  .core-node {
+    position: relative;
+    inset: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    transform: none;
+  }
+
+  .topology-event {
+    width: 100%;
+  }
+
+  .topology-cores {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .node-port {
+    display: none;
+  }
+
+  .bus-node {
+    min-height: auto;
+    border-radius: 28px;
+  }
+
+  .memory-node {
+    margin-top: 0;
+  }
+
+  .mechanics-grid,
+  .protocol-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .simulator-page {
+    padding: 24px 16px 40px;
+  }
+
+  .simulator-copy,
+  .simulator-status,
+  .simulator-controls,
+  .topology-board,
+  .mechanics-card,
+  .protocol-card {
+    border-radius: 24px;
+  }
+
+  .simulator-copy,
+  .topology-board,
+  .mechanics-card,
+  .protocol-card {
+    padding: 22px;
+  }
+
+  .simulator-copy h1 {
+    max-width: none;
+    font-size: clamp(2.4rem, 12vw, 3.8rem);
+  }
+
+  .simulator-status,
+  .topology-cores {
+    grid-template-columns: 1fr;
+  }
+
+  .simulator-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .simulator-controls__meta {
+    justify-items: start;
+  }
+
+  .core-node__header,
+  .protocol-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
