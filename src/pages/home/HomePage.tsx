@@ -228,7 +228,7 @@ function buildMemoryRows(activeOperation: Operation) {
   }))
 }
 
-export function HomePage() {
+export default function HomePage() {
   const [step, setStep] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
 
