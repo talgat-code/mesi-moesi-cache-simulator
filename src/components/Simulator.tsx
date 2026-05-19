@@ -264,7 +264,7 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
         const [xi, yi] = waypoints[i]
         schedule(baseDelay + 50 + i * segMs, () => dispatch({ type: 'MOVE_PKT', id: pkt.id, x: xi, y: yi }))
       }
-      schedule(baseDelay + 50 + waypoints.length * segMs, () => dispatch({ type: 'DEL_PKT', id: pkt.id }))
+      schedule(baseDelay + 50 + waypoints.length * segMs + 150, () => dispatch({ type: 'DEL_PKT', id: pkt.id }))
     },
     [dispatch, schedule]
   )
