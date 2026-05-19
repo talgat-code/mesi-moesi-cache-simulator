@@ -257,7 +257,7 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
 
   const animatePkt = useCallback(
     (pkt: Omit<Packet, 'x' | 'y'>, waypoints: [number, number][], baseDelay: number) => {
-      const segMs = SEG_BASE / speedRef.current
+      const segMs = SEG_BASE
       const [x0, y0] = waypoints[0]
       schedule(baseDelay, () => dispatch({ type: 'ADD_PKT', pkt: { ...pkt, x: x0, y: y0 } }))
       for (let i = 1; i < waypoints.length; i++) {
@@ -275,21 +275,21 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
       schedule(0, () => dispatch({ type: 'SET_ACTIVE_CORE', id: step.initiatorCore }))
 
       for (const sp of step.packets) {
-        animatePkt({ id: sp.id, type: sp.type, label: sp.label, color: sp.color }, sp.waypoints, sp.delay / speedRef.current)
+        animatePkt({ id: sp.id, type: sp.type, label: sp.label, color: sp.color }, sp.waypoints, sp.delay)
       }
 
       if (step.snoopCores.length > 0) {
-        schedule(step.snoopDelay / speedRef.current, () => dispatch({ type: 'SET_SNOOP_CORES', ids: step.snoopCores }))
+        schedule(step.snoopDelay, () => dispatch({ type: 'SET_SNOOP_CORES', ids: step.snoopCores }))
       }
 
       const hitsMem = step.packets.some(p => p.waypoints[p.waypoints.length - 1][0] >= ML - 10)
       if (hitsMem && step.packets[0]) {
-        const arr = (step.packets[0].delay + (step.packets[0].waypoints.length - 1) * SEG_BASE) / speedRef.current
+        const arr = step.packets[0].delay + (step.packets[0].waypoints.length - 1) * SEG_BASE
         schedule(arr, () => dispatch({ type: 'SET_MEM_ACTIVE', v: true }))
-        schedule(arr + 400 / speedRef.current, () => dispatch({ type: 'SET_MEM_ACTIVE', v: false }))
+        schedule(arr + 400, () => dispatch({ type: 'SET_MEM_ACTIVE', v: false }))
       }
 
-      schedule(step.changeMs / speedRef.current, () => {
+      schedule(step.changeMs, () => {
         const baseEntries: LogEntry[] = step.logs.map((l, i) => ({
           id: `lg_${Date.now()}_${i}`, text: l.text, detail: l.detail, kind: l.kind,
         }))
@@ -297,7 +297,7 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
         else dispatch({ type: 'ADD_LOGS', entries: baseEntries })
       })
 
-      schedule(step.totalMs / speedRef.current, () => {
+      schedule(step.totalMs, () => {
         dispatch({ type: 'CLEAR_ANIM' })
         dispatch({ type: 'SET_ANIMATING', v: false })
         onDone?.()
@@ -320,7 +320,6 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
     dispatch({ type: 'STEP_TO', idx: stepIdx })
 
     runStep(step, () => {
-      dispatch({ type: 'APPLY_CHANGES', stepIdx })
       dispatch({ type: 'INC_CACHE_STATS', delta: csDelta })
       if (isPlayingRef.current) {
         const next = stepRef.current + 1
@@ -333,7 +332,7 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
         ...baseEntries,
       ]})
     })
-    schedule(step.changeMs / speedRef.current, () => dispatch({ type: 'APPLY_CHANGES', stepIdx }))
+    schedule(step.changeMs, () => dispatch({ type: 'APPLY_CHANGES', stepIdx }))
   }, [dispatch, schedule, runStep, stateRef])
 
   const runDynStep = useCallback((protocol: Protocol, i: number) => {
@@ -358,7 +357,6 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
     const opNum = ++opCountRef.current
 
     runStep(step, () => {
-      dispatch({ type: 'APPLY_DYN', changes: step.cacheChanges, memChange: step.memChange, statsInc })
       dispatch({ type: 'INC_CACHE_STATS', delta: csDelta })
       if (isPlayingRef.current) schedule(400, () => runDynStep(protocol, i + 1))
     }, (baseEntries) => {
@@ -367,8 +365,8 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
         ...baseEntries,
       ]})
     })
-    schedule(step.changeMs / speedRef.current, () => {
-      dispatch({ type: 'APPLY_DYN', changes: step.cacheChanges, memChange: step.memChange, statsInc: {} })
+    schedule(step.changeMs, () => {
+      dispatch({ type: 'APPLY_DYN', changes: step.cacheChanges, memChange: step.memChange, statsInc })
     })
   }, [runStep, dispatch, schedule, stateRef])
 
@@ -384,7 +382,6 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
       const opNum = ++opCountRef.current
 
       runStep(step, () => {
-        dispatch({ type: 'APPLY_DYN', changes: step.cacheChanges, memChange: step.memChange, statsInc })
         dispatch({ type: 'INC_CACHE_STATS', delta: csDelta })
       }, (baseEntries) => {
         const entries: LogEntry[] = [
@@ -396,8 +393,8 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
         }
         dispatch({ type: 'ADD_LOGS', entries })
       })
-      schedule(step.changeMs / speedRef.current, () => {
-        dispatch({ type: 'APPLY_DYN', changes: step.cacheChanges, memChange: step.memChange, statsInc: {} })
+      schedule(step.changeMs, () => {
+        dispatch({ type: 'APPLY_DYN', changes: step.cacheChanges, memChange: step.memChange, statsInc })
       })
     },
     [state.isAnimating, clearTids, runStep, dispatch, schedule]
@@ -485,7 +482,6 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
       const csDelta = computeCacheStatsDelta(cur.cores, step.cacheChanges, step.packets.map(p => p.type))
       const opNum = ++opCountRef.current
       runStep(step, () => {
-        dispatch({ type: 'APPLY_DYN', changes: step.cacheChanges, memChange: step.memChange, statsInc })
         dispatch({ type: 'INC_CACHE_STATS', delta: csDelta })
         schedule(400, () => runNext(i + 1))
       }, (baseEntries) => {
@@ -494,8 +490,8 @@ function useSimEngine(state: SimState, dispatch: React.Dispatch<Action>) {
           ...baseEntries,
         ]})
       })
-      schedule(step.changeMs / speedRef.current, () => {
-        dispatch({ type: 'APPLY_DYN', changes: step.cacheChanges, memChange: step.memChange, statsInc: {} })
+      schedule(step.changeMs, () => {
+        dispatch({ type: 'APPLY_DYN', changes: step.cacheChanges, memChange: step.memChange, statsInc })
       })
     }
     schedule(50, () => runNext(0))
@@ -672,7 +668,7 @@ function MemoryBox({ entries, active }: { entries: MemEntry[]; active: boolean }
   )
 }
 
-function BusOverlay({ packets }: { packets: Packet[] }) {
+function BusOverlay({ packets, speed }: { packets: Packet[]; speed: number }) {
   return (
     <div className={styles.busOverlay}>
       <svg className={styles.busSvg} width="1050" height="540" viewBox="0 0 1050 540">
@@ -757,7 +753,7 @@ function BusOverlay({ packets }: { packets: Packet[] }) {
           className={styles.busPkt}
           style={{
             left: p.x, top: p.y, background: p.color,
-            transition: `left ${SEG_BASE}ms ease-in-out, top ${SEG_BASE}ms ease-in-out`,
+            transition: `left ${SEG_BASE / speed}ms ease-in-out, top ${SEG_BASE / speed}ms ease-in-out`,
           }}
         >
           {p.label}
@@ -1247,7 +1243,7 @@ export function Simulator() {
             <div style={{ position: 'absolute', left: ML, top: MY - 52 }}>
               <MemoryBox entries={state.memory} active={state.memActive} />
             </div>
-            <BusOverlay packets={state.packets} />
+            <BusOverlay packets={state.packets} speed={state.speed} />
           </div>
 
           <CacheStatsBar stats={state.cacheStats} />
