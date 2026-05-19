@@ -246,7 +246,7 @@ export function computeRead(coreId: number, address: number, state: SimState, pr
   const coldState: MESIState = protocol === 'MSI' ? 'S' : 'E'
   const coldDetail = protocol === 'MSI'
     ? 'MSI: always S on miss'
-    : 'MESI: sole copy → Exclusive'
+    : `${protocol}: sole copy → Exclusive`
 
   return {
     id: 0,
@@ -423,7 +423,7 @@ export function computeWrite(coreId: number, address: number, newData: number, s
         invalidLine(flusher.id, sl.index),
         ...invalids.map(c => invalidLine(c.id, line(state, c.id, address)!.index)),
       ],
-      memChange: flushedSt === 'M' ? { address, data } : undefined,
+      memChange: (flushedSt === 'M' || flushedSt === 'O') ? { address, data } : undefined,
       logs: [
         { text: `Core ${coreId} WRITE ${addrHex} ← ${hex2(newData)}`, detail: 'I → write miss', kind: 'miss' },
         { text: `→ BusRdX(${addrHex})`, detail: `Core ${flusher.id} snoops (${flushedSt})`, kind: 'bus' },
