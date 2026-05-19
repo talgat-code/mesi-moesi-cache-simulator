@@ -566,7 +566,7 @@
 .ctrlProgress { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 140px; }
 .ctrlLabel    {
   font-size: 9px;
-  color: #3a5a88;
+  color: #7aa2cc;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.10em;
@@ -1042,7 +1042,7 @@
 
 .cacheStatLabel {
   font-size: 8.5px;
-  color: #2a4060;
+  color: #7aa2cc;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
